@@ -97,11 +97,29 @@ void ACloudScriptTestResultUploader::UploadToCloudscript(const TArray<class UPla
 void ACloudScriptTestResultUploader::SuccessfulUpload(const PlayFab::ClientModels::FExecuteCloudScriptResult& result)
 {
     UE_LOG(LogTestResults, Log, TEXT("Cloud Upload Success: \n%s"), *result.toJSONString());
+
+#if PLATFORM_ANDROID
+#if ENGINE_MINOR_VERSION < 24
+    GIsRequestingExit = true;	
+#else	
+    RequestEngineExit("Invalid PlayFab Test UnrealEngine Instance");	
+#endif
+#endif
+
     isComplete = true;
 }
 
 void ACloudScriptTestResultUploader::UploadErrored(const PlayFab::FPlayFabCppError& error)
 {
     UE_LOG(LogTestResults, Error, TEXT("Cloud Upload Error: \n%s"), *error.GenerateErrorReport());
+
+#if PLATFORM_ANDROID
+#if ENGINE_MINOR_VERSION < 24	
+    GIsRequestingExit = true;	
+#else	
+    RequestEngineExit("Invalid PlayFab Test UnrealEngine Instance");	
+#endif
+#endif
+
     isComplete = true;
 }
